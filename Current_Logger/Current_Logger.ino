@@ -87,7 +87,7 @@ void setup()
     lcd.print("Initialization  ");
     lcd.setCursor(0, 1);
     lcd.print(" insert SD Card ");
-    delay(TIME);
+    delay(1000);
   }
 
   lcd.home();
@@ -109,9 +109,7 @@ void setup()
 
 void loop()   {
   /******************* Main Display ****************************/
-  while (mode == 0)  {
-
-    if (!encoderValue) {
+   if (!encoderValue) {
       unsigned long currentMillis = millis();
       if (currentMillis - previousMillis >= interval) {
         digitalWrite(Backlight, LOW);
@@ -136,7 +134,6 @@ void loop()   {
     }
 
     unsigned long current = millis();
-    
     if (current - previous >= 2000) {
       now_datetime();
       Read_ARMS();
@@ -146,18 +143,18 @@ void loop()   {
       lcd.print(_month);
       lcd.print("/");
       lcd.print(_year);
-      lcd.print(" ");
+      lcd.print("  ");
+      if (_hour >= 0 && _hour <= 9) lcd.print("0");
       lcd.print(_hour);
       lcd.print(":");
+      if (_minute >= 0 && _minute <= 9) lcd.print("0");
       lcd.print(_minute);
-      lcd.print(":");
-      lcd.print(_second);
       lcd.print("   ");
-      
+
       lcd.setCursor(0, 1);
-      lcd.print("U = ");
+      lcd.print(" U = ");
       lcd.print(line1 / 10.0, 1);
-      lcd.print("       ");
+      lcd.print(" A-RMS     ");
     }
 
     if (current - previous >= 4000) {
@@ -169,18 +166,18 @@ void loop()   {
       lcd.print(_month);
       lcd.print("/");
       lcd.print(_year);
-      lcd.print(" ");
+      lcd.print("  ");
+      if (_hour >= 0 && _hour <= 9) lcd.print("0");
       lcd.print(_hour);
       lcd.print(":");
+      if (_minute >= 0 && _minute <= 9) lcd.print("0");
       lcd.print(_minute);
-      lcd.print(":");
-      lcd.print(_second);
       lcd.print("   ");
 
       lcd.setCursor(0, 1);
-      lcd.print("V = ");
+      lcd.print(" V = ");
       lcd.print(line2 / 10.0, 1);
-      lcd.print("       ");
+      lcd.print(" A-RMS     ");
     }
 
     if (current - previous >= 6000) {
@@ -192,18 +189,18 @@ void loop()   {
       lcd.print(_month);
       lcd.print("/");
       lcd.print(_year);
-      lcd.print(" ");
+      lcd.print("  ");
+      if (_hour >= 0 && _hour <= 9) lcd.print("0");
       lcd.print(_hour);
       lcd.print(":");
+      if (_minute >= 0 && _minute <= 9) lcd.print("0");
       lcd.print(_minute);
-      lcd.print(":");
-      lcd.print(_second);
       lcd.print("   ");
 
       lcd.setCursor(0, 1);
-      lcd.print("W = ");
+      lcd.print(" W = ");
       lcd.print(line3 / 10.0, 1);
-      lcd.print("       ");
+      lcd.print(" A-RMS     ");
       previous = current;
     }
 
@@ -219,10 +216,9 @@ void loop()   {
         writing(line_1, line_2, line_3);
         pre = EEPROM.read(9) + _minute; // update time
         debug();
-      }
+      } 
     }
-  }
-
+  
   /******************* Set date ****************************/
   while (mode == 1)  {
     digitalWrite(Backlight, HIGH);
