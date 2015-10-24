@@ -49,6 +49,7 @@ unsigned int set_year  =       0;   // Set Year   0-99
 
 unsigned long previousMillis = 0;
 unsigned long previous = 0;
+unsigned long previous_clam = 0;
 const long interval = 30000; // delay for led backlight
 
 int addr = 0;
@@ -109,6 +110,7 @@ void setup()
 
 void loop()   {
   /******************* Main Display ****************************/
+   // Function for backlight count down
    if (!encoderValue) {
       unsigned long currentMillis = millis();
       if (currentMillis - previousMillis >= interval) {
@@ -133,6 +135,7 @@ void loop()   {
       mode = 1;
     }
 
+    //  Show main display 
     unsigned long current = millis();
     if (current - previous >= 2000) {
       now_datetime();
@@ -204,6 +207,13 @@ void loop()   {
       previous = current;
     }
 
+    unsigned long debug_clamp = millis(); 
+    if(debug_clamp - previous_clam >= 60000)  {  // debug clamp every 1 minute
+      debug();
+      previous_clam = debug_clamp;
+    }
+
+    //  Function logger then push button and time count down
     if (pre >= 59)  {
       pre = pre - 59;
     }
