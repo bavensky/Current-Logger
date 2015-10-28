@@ -10,7 +10,13 @@ void main_name() {
     myFile.print(",");
     myFile.print("V (A-RMS)");
     myFile.print(",");
-    myFile.println("W (A-RMS)");
+    myFile.print("W (A-RMS)");
+    myFile.print(",");
+    myFile.print("Power U (kW)");
+    myFile.print(",");
+    myFile.print("Power V (kW)");
+    myFile.print(",");
+    myFile.println("Power W (kW)");
     delay(TIME);
     myFile.close();
   }
@@ -40,7 +46,13 @@ void writing(float line1, float line2, float line3)  {
     myFile.print(line2);
     myFile.print(",");
     if (line3 >= 601) line3 = 0;
-    myFile.println(line3);
+    myFile.print(line3);
+    myFile.print(",");
+    myFile.print(power_U = 0.22f * line1);
+    myFile.print(",");
+    myFile.print(power_V = 0.22f * line2);
+    myFile.print(",");
+    myFile.println(power_W = 0.22f * line3);
     delay(TIME);
     myFile.close();
   }

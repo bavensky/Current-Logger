@@ -65,6 +65,10 @@ float line_1 = 0.0;
 float line_2 = 0.0;
 float line_3 = 0.0;
 
+float power_U = 0.0;
+float power_V = 0.0;
+float power_W = 0.0;
+
 void setup()
 {
   Serial.begin(115200);
