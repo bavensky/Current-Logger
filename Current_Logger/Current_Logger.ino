@@ -51,6 +51,7 @@ unsigned long previousMillis = 0;
 unsigned long previous = 0;
 unsigned long previous_clam = 0;
 const long interval = 30000; // delay for led backlight
+int lcd_state = 0;
 
 int addr = 0;
 int periods = 0;
@@ -59,6 +60,7 @@ int pre = 0;
 int line1 = 0;
 int line2 = 0;
 int line3 = 0;
+
 float line_1 = 0.0;
 float line_2 = 0.0;
 float line_3 = 0.0;
@@ -105,130 +107,139 @@ void setup()
   now_datetime();
   pre = EEPROM.read(9) + _minute;
   lcd.clear();
-
 }
 
 void loop()   {
   /******************* Main Display ****************************/
-   // Function for backlight count down
-   if (!encoderValue) {
-      unsigned long currentMillis = millis();
-      if (currentMillis - previousMillis >= interval) {
-        digitalWrite(Backlight, LOW);
-        previousMillis = currentMillis;
-      }
+  // Function for backlight count down
+  if (!encoderValue) {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      digitalWrite(Backlight, LOW);
+      previousMillis = currentMillis;
     }
-    else  {
-      digitalWrite(Backlight, HIGH);
-      encoderValue = !encoderValue;
-    }
+  }
+  else  {
+    digitalWrite(Backlight, HIGH);
+    encoderValue = !encoderValue;
+  }
 
-    if (digitalRead(encoderSwitchPin) == 0) {
-      delay(DEBOUNCE);
-      set_monthDay  = 0;
-      set_month = 0;
-      set_year  = 0;
-      set_hour  = 0;
-      set_minute  = 0;
-      set_second  =  0;
-      lcd.clear();
-      mode = 1;
-    }
+  if (digitalRead(encoderSwitchPin) == 0) {
+    delay(DEBOUNCE);
+    set_monthDay  = 0;
+    set_month = 0;
+    set_year  = 0;
+    set_hour  = 0;
+    set_minute  = 0;
+    set_second  =  0;
+    lcd.clear();
+    mode = 1;
+  }
 
-    //  Show main display 
-    unsigned long current = millis();
-    if (current - previous >= 2000) {
-      now_datetime();
-      Read_ARMS();
-      lcd.setCursor(0, 0);
-      lcd.print(_monthDay);
-      lcd.print("/");
-      lcd.print(_month);
-      lcd.print("/");
-      lcd.print(_year);
-      lcd.print("  ");
-      if (_hour >= 0 && _hour <= 9) lcd.print("0");
-      lcd.print(_hour);
-      lcd.print(":");
-      if (_minute >= 0 && _minute <= 9) lcd.print("0");
-      lcd.print(_minute);
-      lcd.print("   ");
+  //  Show main display
+  unsigned long current = millis();
 
-      lcd.setCursor(0, 1);
-      lcd.print(" U = ");
-      lcd.print(line1 / 10.0, 1);
-      lcd.print(" A-RMS     ");
-    }
+  if (current - previous >= 2000) {
+    lcd_state += 1;
+    previous = current;
+  }
 
-    if (current - previous >= 4000) {
-      now_datetime();
-      Read_ARMS();
-      lcd.setCursor(0, 0);
-      lcd.print(_monthDay);
-      lcd.print("/");
-      lcd.print(_month);
-      lcd.print("/");
-      lcd.print(_year);
-      lcd.print("  ");
-      if (_hour >= 0 && _hour <= 9) lcd.print("0");
-      lcd.print(_hour);
-      lcd.print(":");
-      if (_minute >= 0 && _minute <= 9) lcd.print("0");
-      lcd.print(_minute);
-      lcd.print("   ");
+  if (lcd_state == 0) {
+    Serial.print(" U ");
+    now_datetime();
+    Read_ARMS();
+    lcd.setCursor(0, 0);
+    lcd.print(_monthDay);
+    lcd.print("/");
+    lcd.print(_month);
+    lcd.print("/");
+    lcd.print(_year);
+    lcd.print("  ");
+    if (_hour >= 0 && _hour <= 9) lcd.print("0");
+    lcd.print(_hour);
+    lcd.print(":");
+    if (_minute >= 0 && _minute <= 9) lcd.print("0");
+    lcd.print(_minute);
+    lcd.print("   ");
 
-      lcd.setCursor(0, 1);
-      lcd.print(" V = ");
-      lcd.print(line2 / 10.0, 1);
-      lcd.print(" A-RMS     ");
-    }
+    lcd.setCursor(0, 1);
+    lcd.print(" U = ");
+    lcd.print(line1 / 10.0, 1);
+    lcd.print(" A-RMS     ");
+  }
 
-    if (current - previous >= 6000) {
-      now_datetime();
-      Read_ARMS();
-      lcd.setCursor(0, 0);
-      lcd.print(_monthDay);
-      lcd.print("/");
-      lcd.print(_month);
-      lcd.print("/");
-      lcd.print(_year);
-      lcd.print("  ");
-      if (_hour >= 0 && _hour <= 9) lcd.print("0");
-      lcd.print(_hour);
-      lcd.print(":");
-      if (_minute >= 0 && _minute <= 9) lcd.print("0");
-      lcd.print(_minute);
-      lcd.print("   ");
+  if (lcd_state == 1) {
+    Serial.print(" V ");
+    now_datetime();
+    Read_ARMS();
+    lcd.setCursor(0, 0);
+    lcd.print(_monthDay);
+    lcd.print("/");
+    lcd.print(_month);
+    lcd.print("/");
+    lcd.print(_year);
+    lcd.print("  ");
+    if (_hour >= 0 && _hour <= 9) lcd.print("0");
+    lcd.print(_hour);
+    lcd.print(":");
+    if (_minute >= 0 && _minute <= 9) lcd.print("0");
+    lcd.print(_minute);
+    lcd.print("   ");
 
-      lcd.setCursor(0, 1);
-      lcd.print(" W = ");
-      lcd.print(line3 / 10.0, 1);
-      lcd.print(" A-RMS     ");
-      previous = current;
-    }
+    lcd.setCursor(0, 1);
+    lcd.print(" V = ");
+    lcd.print(line2 / 10.0, 1);
+    lcd.print(" A-RMS     ");
+  }
 
-    unsigned long debug_clamp = millis(); 
-    if(debug_clamp - previous_clam >= 60000)  {  // debug clamp every 1 minute
+  if (lcd_state == 2) {
+    Serial.print(" W ");
+    now_datetime();
+    Read_ARMS();
+    lcd.setCursor(0, 0);
+    lcd.print(_monthDay);
+    lcd.print("/");
+    lcd.print(_month);
+    lcd.print("/");
+    lcd.print(_year);
+    lcd.print("  ");
+    if (_hour >= 0 && _hour <= 9) lcd.print("0");
+    lcd.print(_hour);
+    lcd.print(":");
+    if (_minute >= 0 && _minute <= 9) lcd.print("0");
+    lcd.print(_minute);
+    lcd.print("   ");
+
+    lcd.setCursor(0, 1);
+    lcd.print(" W = ");
+    lcd.print(line3 / 10.0, 1);
+    lcd.print(" A-RMS     ");
+  }
+
+  if (lcd_state == 3) lcd_state = 0;
+
+  unsigned long debug_clamp = millis();
+  if (debug_clamp - previous_clam >= 60000)  { // debug clamp every 1 minute
+    debug();
+    previous_clam = debug_clamp;
+  }
+
+  //  Function logger then push button and time count down
+  if (pre >= 59)  {
+    pre = pre - 59;
+  }
+  if (digitalRead(LOG) == 0 && pre == _minute)  {
+    Read_ARMS();
+    if (digitalRead(LOG) == 0)  {   // read clamp  and writing data to sd card
+      line_1 = line1 / 10.0;
+      line_2 = line2 / 10.0;
+      line_3 = line3 / 10.0;
+      writing(line_1, line_2, line_3);
+      pre = EEPROM.read(9) + _minute; // update time
       debug();
-      previous_clam = debug_clamp;
     }
+  }
 
-    //  Function logger then push button and time count down
-    if (pre >= 59)  {
-      pre = pre - 59;
-    }
-    if (digitalRead(LOG) == 0 && pre == _minute)  {
-      Read_ARMS();
-      if (digitalRead(LOG) == 0)  {   // read clamp  and writing data to sd card
-        line_1 = line1 / 10.0;
-        line_2 = line2 / 10.0;
-        line_3 = line3 / 10.0;
-        writing(line_1, line_2, line_3);
-        pre = EEPROM.read(9) + _minute; // update time
-        debug();
-      } 
-    }
-  
   /******************* Set date ****************************/
   while (mode == 1)  {
     digitalWrite(Backlight, HIGH);

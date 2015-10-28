@@ -33,13 +33,13 @@ void writing(float line1, float line2, float line3)  {
     myFile.print(":");
     myFile.print(_second);
     myFile.print(",");
-    if(line1 >= 601) line1 = 0;
+    if (line1 >= 601) line1 = 0;
     myFile.print(line1);
     myFile.print(",");
-    if(line2 >= 601) line2 = 0;
+    if (line2 >= 601) line2 = 0;
     myFile.print(line2);
     myFile.print(",");
-    if(line3 >= 601) line3 = 0;
+    if (line3 >= 601) line3 = 0;
     myFile.println(line3);
     delay(TIME);
     myFile.close();
